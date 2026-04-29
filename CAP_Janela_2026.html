@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Athletico Paranaense — Relatório de Janela 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --red: #CC0000;
+    --dark-red: #990000;
+    --black: #0A0A0A;
+    --dark: #111111;
+    --mid: #1A1A1A;
+    --card: #1E1E1E;
+    --border: #2A2A2A;
+    --text: #E8E8E8;
+    --muted: #888888;
+    --accent: #FF2222;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--black);
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  /* COVER */
+  .cover {
+    background: linear-gradient(160deg, #0A0A0A 0%, #1a0000 50%, #0A0A0A 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 40px;
+    position: relative;
+    page-break-after: always;
+    border-bottom: 3px solid var(--red);
+  }
+
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse at center, rgba(204,0,0,0.08) 0%, transparent 70%);
+  }
+
+  .cover-badge {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 24px;
+    position: relative;
+  }
+
+  .cover h1 {
+    font-size: 64px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -2px;
+    line-height: 1;
+    position: relative;
+  }
+
+  .cover h1 span {
+    color: var(--red);
+  }
+
+  .cover-sub {
+    font-size: 18px;
+    font-weight: 300;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 16px;
+    position: relative;
+  }
+
+  .cover-divider {
+    width: 60px;
+    height: 3px;
+    background: var(--red);
+    margin: 32px auto;
+    position: relative;
+  }
+
+  .cover-meta {
+    display: flex;
+    gap: 48px;
+    justify-content: center;
+    position: relative;
+  }
+
+  .cover-meta-item {
+    text-align: center;
+  }
+
+  .cover-meta-item .val {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--red);
+  }
+
+  .cover-meta-item .label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .cover-footer {
+    position: absolute;
+    bottom: 32px;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--border);
+    text-transform: uppercase;
+  }
+
+  /* PAGES */
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 48px;
+  }
+
+  /* SECTION HEADER */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-number {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--red);
+    text-transform: uppercase;
+  }
+
+  .section-title {
+    font-size: 22px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* FORMATION */
+  .formation-container {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 32px;
+  }
+
+  .formation-pitch {
+    background: linear-gradient(180deg, #082008 0%, #0c2e0c 30%, #0e320e 50%, #0c2e0c 70%, #082008 100%);
+    padding: 44px 36px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Grass stripes */
+  .formation-pitch::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      180deg,
+      rgba(255,255,255,0.013) 0px,
+      rgba(255,255,255,0.013) 32px,
+      transparent 32px,
+      transparent 64px
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Pitch boundary glow */
+  .formation-pitch::after {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Pitch line elements */
+  .pitch-halfway {
+    position: absolute;
+    top: 50%;
+    left: 5%;
+    right: 5%;
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .pitch-center-circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 50%;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .pitch-center-dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 5px;
+    height: 5px;
+    background: rgba(255,255,255,0.18);
+    border-radius: 50%;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .pitch-penalty-top {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 46%;
+    height: 72px;
+    border: 1px solid rgba(255,255,255,0.09);
+    border-top: none;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .pitch-penalty-bottom {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 46%;
+    height: 72px;
+    border: 1px solid rgba(255,255,255,0.09);
+    border-bottom: none;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .pitch-goal-top {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20%;
+    height: 24px;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-top: none;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .pitch-goal-bottom {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20%;
+    height: 24px;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-bottom: none;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .formation-label {
+    text-align: center;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: rgba(204,0,0,0.8);
+    text-transform: uppercase;
+    margin-bottom: 28px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .formation-row {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 22px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .player-card {
+    text-align: center;
+    min-width: 86px;
+  }
+
+  .player-shirt {
+    width: 46px;
+    height: 50px;
+    background: linear-gradient(150deg, #E01010 0%, #AA0000 50%, #880000 100%);
+    border-radius: 5px 5px 9px 9px;
+    margin: 0 auto 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 900;
+    color: rgba(0,0,0,0.82);
+    position: relative;
+    letter-spacing: -1px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.55), 0 1px 0 rgba(255,100,100,0.15) inset;
+  }
+
+  /* Jersey collar */
+  .player-shirt::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 15px;
+    height: 7px;
+    background: #770000;
+    border-radius: 0 0 7px 7px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  }
+
+  .player-shirt.new {
+    box-shadow: 0 4px 14px rgba(0,0,0,0.55), 0 0 14px rgba(255,210,0,0.2);
+  }
+
+  .player-shirt.new::after {
+    content: '★';
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    font-size: 10px;
+    color: #FFD700;
+    text-shadow: 0 0 6px rgba(255,215,0,0.7);
+  }
+
+  .player-shirt.gk {
+    background: linear-gradient(150deg, #A07820 0%, #7A5510 50%, #5A3D08 100%);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.55), 0 1px 0 rgba(255,200,50,0.1) inset;
+  }
+
+  .player-shirt.gk::before {
+    background: #4a3208;
+  }
+
+  .player-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(240,240,240,0.95);
+    white-space: nowrap;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  }
+
+  .player-pos {
+    font-size: 8px;
+    color: rgba(150,150,150,0.8);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 1px;
+  }
+
+  /* TABLE */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 32px;
+    font-size: 12px;
+  }
+
+  .data-table th {
+    background: var(--mid);
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 2px solid var(--red);
+  }
+
+  .data-table td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  .data-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .data-table tr:hover td {
+    background: rgba(255,255,255,0.02);
+  }
+
+  .data-table .new-tag {
+    display: inline-block;
+    background: rgba(204,0,0,0.15);
+    color: var(--red);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    margin-left: 6px;
+    border: 1px solid rgba(204,0,0,0.3);
+  }
+
+  .data-table .loan-tag {
+    display: inline-block;
+    background: rgba(255,165,0,0.1);
+    color: #FFA500;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    margin-left: 6px;
+    border: 1px solid rgba(255,165,0,0.3);
+  }
+
+  .data-table .base-tag {
+    display: inline-block;
+    background: transparent;
+    color: #5a8a5a;
+    font-size: 8px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    margin-left: 5px;
+    border: 1px solid rgba(100,180,100,0.2);
+  }
+
+  .highlight-row td {
+    background: rgba(204,0,0,0.05) !important;
+    font-weight: 600;
+  }
+
+  /* PLAYER PROFILE CARDS */
+  .player-profile {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 28px;
+    page-break-inside: avoid;
+  }
+
+  .profile-header {
+    background: linear-gradient(135deg, var(--dark-red) 0%, #660000 100%);
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .profile-header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .profile-number {
+    font-size: 36px;
+    font-weight: 900;
+    color: rgba(255,255,255,0.15);
+    line-height: 1;
+  }
+
+  .profile-name {
+    font-size: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .profile-role {
+    font-size: 11px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .profile-flag {
+    font-size: 28px;
+  }
+
+  .profile-body {
+    padding: 20px 24px;
+  }
+
+  .profile-stats {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .stat-item {
+    background: var(--mid);
+    border-radius: 6px;
+    padding: 10px;
+    text-align: center;
+  }
+
+  .stat-val {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--red);
+  }
+
+  .stat-label {
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  .profile-desc {
+    font-size: 12px;
+    color: #CCCCCC;
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+
+  .profile-costs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .cost-item {
+    background: var(--mid);
+    border-radius: 6px;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .cost-label {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .cost-val {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .slot-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(204,0,0,0.15);
+    border: 1px solid rgba(204,0,0,0.3);
+    color: var(--red);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    margin-top: 8px;
+    display: block;
+    width: fit-content;
+  }
+
+  /* FINANCIALS */
+  .finance-block {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  .finance-header {
+    background: var(--mid);
+    padding: 12px 20px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .finance-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .finance-row:last-child {
+    border-bottom: none;
+  }
+
+  .finance-row.total {
+    background: rgba(204,0,0,0.05);
+    padding: 16px 20px;
+  }
+
+  .finance-row.total .finance-label {
+    font-weight: 700;
+    color: var(--text);
+    font-size: 13px;
+  }
+
+  .finance-row.total .finance-val {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--red);
+  }
+
+  .finance-label {
+    font-size: 12px;
+    color: #CCCCCC;
+  }
+
+  .finance-val {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .finance-val.positive {
+    color: #4CAF50;
+  }
+
+  .finance-val.negative {
+    color: var(--red);
+  }
+
+  /* BALANCE CARD */
+  .balance-card {
+    background: linear-gradient(135deg, #0a1a0a 0%, #0d2b0d 100%);
+    border: 1px solid #1a4a1a;
+    border-radius: 8px;
+    padding: 32px;
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .balance-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #4CAF50;
+    margin-bottom: 8px;
+  }
+
+  .balance-val {
+    font-size: 52px;
+    font-weight: 900;
+    color: #4CAF50;
+    line-height: 1;
+  }
+
+  .balance-desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 8px;
+    letter-spacing: 1px;
+  }
+
+  /* STARS */
+  .stars {
+    color: var(--red);
+    letter-spacing: 2px;
+  }
+
+  /* DIVIDER */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 32px 0;
+  }
+
+  /* PAGE BREAK */
+  .page-break {
+    page-break-before: always;
+  }
+
+  /* FOOTER */
+  .doc-footer {
+    text-align: center;
+    padding: 40px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* PRINT */
+  @media print {
+    body { background: #0A0A0A; }
+    .cover { min-height: 100vh; }
+    .player-profile { page-break-inside: avoid; }
+    @page { margin: 0; size: A4; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="cover-badge">Mateus Zambruno</div>
+  <h1>Olho do<br><span>Furacão</span></h1>
+  <div class="cover-sub">Relatório de Janela · 2026</div>
+  <div class="cover-divider"></div>
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <div class="val">5</div>
+      <div class="label">Contratações</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="val">€14M</div>
+      <div class="label">Investimento</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="val">€28M</div>
+      <div class="label">Receitas</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="val">3-5-2</div>
+      <div class="label">Formação</div>
+    </div>
+  </div>
+  <div class="cover-footer">Furacão · Odair Hellmann · Temporada 2026</div>
+</div>
+
+<!-- PAGE 1: LINEUP -->
+<div class="page">
+  <div class="section-header">
+    <span class="section-number">01</span>
+    <span class="section-title">11 Iniciais — 3-5-2</span>
+  </div>
+
+  <div class="formation-container">
+    <div class="formation-pitch">
+      <div class="pitch-halfway"></div>
+      <div class="pitch-center-circle"></div>
+      <div class="pitch-center-dot"></div>
+      <div class="pitch-penalty-top"></div>
+      <div class="pitch-penalty-bottom"></div>
+      <div class="pitch-goal-top"></div>
+      <div class="pitch-goal-bottom"></div>
+      <div class="formation-label">Odair Hellmann · 3-5-2</div>
+
+      <!-- Atacantes -->
+      <div class="formation-row">
+        <div class="player-card">
+          <div class="player-shirt new">11</div>
+          <div class="player-name">Kerwin Vargas</div>
+          <div class="player-pos">Ponta Lança</div>
+        </div>
+        <div class="player-card">
+          <div class="player-shirt">9</div>
+          <div class="player-name">Viveros</div>
+          <div class="player-pos">Centroavante</div>
+        </div>
+      </div>
+
+      <!-- Meio -->
+      <div class="formation-row">
+        <div class="player-card">
+          <div class="player-shirt">7</div>
+          <div class="player-name">Mendoza</div>
+          <div class="player-pos">Ala Esq.</div>
+        </div>
+        <div class="player-card">
+          <div class="player-shirt">14</div>
+          <div class="player-name">Luiz Gustavo</div>
+          <div class="player-pos">2º Volante</div>
+        </div>
+        <div class="player-card">
+          <div class="player-shirt new">10</div>
+          <div class="player-name">Lescano</div>
+          <div class="player-pos">Armador</div>
+        </div>
+        <div class="player-card">
+          <div class="player-shirt">27</div>
+          <div class="player-name">Portilla</div>
+          <div class="player-pos">1º Volante</div>
+        </div>
+        <div class="player-card">
+          <div class="player-shirt">29</div>
+          <div class="player-name">Benavidez</div>
+          <div class="player-pos">Ala Dir.</div>
+        </div>
+      </div>
+
+      <!-- Zaga -->
+      <div class="formation-row">
+        <div class="player-card">
+          <div class="player-shirt">37</div>
+          <div class="player-name">Esquivel</div>
+          <div class="player-pos">Zagueiro E</div>
+        </div>
+        <div class="player-card">
+          <div class="player-shirt">33</div>
+          <div class="player-name">Aguirre</div>
+          <div class="player-pos">Zagueiro C</div>
+        </div>
+        <div class="player-card">
+          <div class="player-shirt">4</div>
+          <div class="player-name">Arthur Dias</div>
+          <div class="player-pos">Zagueiro D</div>
+        </div>
+      </div>
+
+      <!-- GK -->
+      <div class="formation-row">
+        <div class="player-card">
+          <div class="player-shirt gk">23</div>
+          <div class="player-name">Santos</div>
+          <div class="player-pos">Goleiro</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Jogador</th>
+        <th>Posição</th>
+        <th>Perfil</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>23</strong></td><td>Santos</td><td>Goleiro</td><td>Titular consolidado, saída de bola</td><td>Plantel</td></tr>
+      <tr><td><strong>37</strong></td><td>Esquivel</td><td>Zagueiro Esq.</td><td>Passe, saída com bola</td><td>Plantel</td></tr>
+      <tr><td><strong>33</strong></td><td>Aguirre</td><td>Zagueiro Central</td><td>Ancoragem, liderança</td><td>Plantel</td></tr>
+      <tr><td><strong>4</strong></td><td>Arthur Dias</td><td>Zagueiro Dir.</td><td>Aéreo, marcação intensa</td><td>Plantel</td></tr>
+      <tr><td><strong>7</strong></td><td>Mendoza</td><td>Ala Esquerdo</td><td>Chegada, cruzamento, volume</td><td>Plantel</td></tr>
+      <tr><td><strong>14</strong></td><td>Luiz Gustavo</td><td>2º Volante</td><td>Experiente, distribuição</td><td>Plantel</td></tr>
+      <tr class="highlight-row"><td><strong>10</strong></td><td>Lescano <span class="new-tag">NOVO</span></td><td>Armador</td><td>Criação, drible curto, visão</td><td>Contratação</td></tr>
+      <tr><td><strong>27</strong></td><td>Portilla</td><td>1º Volante</td><td>Pivô defensivo, posicionamento</td><td>Plantel</td></tr>
+      <tr><td><strong>29</strong></td><td>Benavidez</td><td>Ala Direito</td><td>Intensidade, 1v1, volume</td><td>Plantel</td></tr>
+      <tr><td><strong>9</strong></td><td>Viveros</td><td>Centroavante</td><td>Referência, movimentação, finalização</td><td>Plantel</td></tr>
+      <tr class="highlight-row"><td><strong>11</strong></td><td>Kerwin Vargas <span class="new-tag">NOVO</span></td><td>Ponta de Lança</td><td>Explosão, facão, segunda referência</td><td>Contratação</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- PAGE 2: RESERVAS -->
+<div class="page page-break">
+  <div class="section-header">
+    <span class="section-number">02</span>
+    <span class="section-title">Elenco Completo — Reservas</span>
+  </div>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Posição</th>
+        <th>Reserva</th>
+        <th>Cobre</th>
+        <th>Observação</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Goleiro</td><td>Mycael <span class="base-tag">BASE</span></td><td>Santos</td><td>Revelado na base, integrado ao elenco principal</td><td>Plantel</td></tr>
+      <tr class="highlight-row"><td>Zagueiro</td><td>Rodrigão <span class="new-tag">NOVO</span></td><td>Trio titular</td><td>Ex-Red Star, formação europeia, cobre qualquer zagueiro</td><td>Contratação</td></tr>
+      <tr><td>Zagueiro</td><td>Teran</td><td>Esquivel</td><td>3ª opção emergência</td><td>Plantel</td></tr>
+      <tr><td>Ala Esq.</td><td>Léo Derik <span class="base-tag">BASE</span></td><td>Mendoza</td><td>Revelado na base, integrado ao elenco principal</td><td>Plantel</td></tr>
+      <tr><td>Ala Dir.</td><td>Gilberto</td><td>Benavidez</td><td>Reserva imediato</td><td>Plantel</td></tr>
+      <tr class="highlight-row"><td>1º Volante</td><td>Walace <span class="new-tag">NOVO</span></td><td>Portilla / Luiz G.</td><td>Ex-Udinese (Serie A), nível europeu, versátil</td><td>Contratação</td></tr>
+      <tr><td>1º Volante</td><td>Jadson</td><td>Portilla</td><td>Cobertura interna</td><td>Plantel</td></tr>
+      <tr><td>2º Volante</td><td>João Cruz <span class="base-tag">BASE</span></td><td>Luiz Gustavo</td><td>Revelado na base, integrado ao elenco principal</td><td>Plantel</td></tr>
+      <tr><td>2º Volante</td><td>Felipinho</td><td>Luiz Gustavo</td><td>Cobertura interna</td><td>Plantel</td></tr>
+      <tr><td>2º Volante</td><td>Riquelme <span class="base-tag">BASE</span></td><td>Luiz Gustavo</td><td>Revelado na base, integrado ao elenco principal</td><td>Plantel</td></tr>
+      <tr><td>Armador</td><td>Dudu <span class="base-tag">BASE</span></td><td>Lescano</td><td>Revelado na base, integrado ao elenco principal</td><td>Plantel</td></tr>
+      <tr><td>Armador</td><td>Marezi <span class="base-tag">BASE</span></td><td>Lescano</td><td>Revelado na base, integrado ao elenco principal</td><td>Plantel</td></tr>
+      <tr><td>Ponta Esq.</td><td>Isaac</td><td>Mendoza / Kerwin</td><td>Velocidade e explosão pela ponta esquerda</td><td>Plantel</td></tr>
+      <tr><td>Ponta Dir.</td><td>Leozinho</td><td>Benavidez / Kerwin</td><td>Velocidade e explosão pela ponta direita</td><td>Plantel</td></tr>
+      <tr class="highlight-row"><td>Centroavante</td><td style="white-space:nowrap">Pedro Raul <span class="loan-tag">LOAN</span></td><td>Viveros</td><td>Hold-up play, perfil diferente, faz o time respirar</td><td>Empréstimo</td></tr>
+      <tr><td>Centroavante</td><td>Renan Peixoto</td><td>Viveros</td><td>Ajudou na Série B, conhece o clube e o sistema</td><td>Plantel</td></tr>
+      <tr><td>Ponta Lança</td><td>Julimar</td><td>Kerwin Vargas</td><td>Cobertura do Kerwin</td><td>Plantel</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- PAGE 3-7: PLAYER PROFILES -->
+<div class="page page-break" style="padding-bottom:0">
+  <div class="section-header">
+    <span class="section-number">03</span>
+    <span class="section-title">Perfis das Contratações</span>
+  </div>
+
+  <!-- LESCANO -->
+  <div class="player-profile">
+    <div class="profile-header">
+      <div class="profile-header-left">
+        <div class="profile-number">01</div>
+        <div>
+          <div class="profile-name">Alan Lescano</div>
+          <div class="profile-role">Meia Atacante · Armador · Argentinos Juniors → CAP</div>
+        </div>
+      </div>
+      <div class="profile-flag">🇦🇷</div>
+    </div>
+    <div class="profile-body">
+      <div class="profile-stats">
+        <div class="stat-item">
+          <div class="stat-val">25</div>
+          <div class="stat-label">Idade</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">1,73m</div>
+          <div class="stat-label">Altura</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">Esq.</div>
+          <div class="stat-label">Pé</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">€7,5M</div>
+          <div class="stat-label">Val. TM</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">Slot 1</div>
+          <div class="stat-label">Estrangeiro</div>
+        </div>
+      </div>
+      <p class="profile-desc">
+        Armador clássico no molde argentino. Joga entre linhas, pede a bola de frente pro gol, tem drible curto de qualidade e visão para abrir espaços. No 3-5-2 do CAP, ocupa o espaço entre a linha defensiva adversária e o meio-campo, funcionando como o cérebro do time em transição. Passe de calcanhar, condução em espaços reduzidos, chute de fora da área. Direitos divididos 50% Argentinos Juniors / 50% Gimnasia La Plata — negociação complexa, mas CAP disposto a superar o recorde de $6M USD pelo Cetré.
+      </p>
+      <span class="slot-badge">⚠ Usa vaga de estrangeiro · Slot 1/2</span>
+      <div class="profile-costs" style="margin-top:16px">
+        <div class="cost-item">
+          <div class="cost-label">Custo de compra</div>
+          <div class="cost-val">~€7,0M</div>
+        </div>
+        <div class="cost-item">
+          <div class="cost-label">Salário mensal</div>
+          <div class="cost-val">~R$ 400k/mês</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KERWIN -->
+  <div class="player-profile">
+    <div class="profile-header">
+      <div class="profile-header-left">
+        <div class="profile-number">02</div>
+        <div>
+          <div class="profile-name">Kerwin Vargas</div>
+          <div class="profile-role">Ponta de Lança · Segunda Referência · Charlotte FC → CAP</div>
+        </div>
+      </div>
+      <div class="profile-flag">🇨🇴</div>
+    </div>
+    <div class="profile-body">
+      <div class="profile-stats">
+        <div class="stat-item">
+          <div class="stat-val">23</div>
+          <div class="stat-label">Idade</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">1,80m</div>
+          <div class="stat-label">Altura</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">Dir.</div>
+          <div class="stat-label">Pé</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">€3,5M</div>
+          <div class="stat-label">Val. TM</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">62</div>
+          <div class="stat-label">Chutes/24</div>
+        </div>
+      </div>
+      <p class="profile-desc">
+        Segundo atacante com liberdade total de movimentação. Joga como ponta de lança ao lado do Viveros — parte da posição de ala, cai para o centro, faz a diagonal em profundidade ("facão") aproveitando o espaço gerado pela referência. Alto volume de finalizações: 62 chutes em 2024 na MLS. Perfil que explode em transição, rápido, intenso, capaz da jogada individual. Jogou CF e extremo direito pela Colômbia Sub-23 — versatilidade que o Odair vai explorar ao longo da temporada.
+      </p>
+      <span class="slot-badge">⚠ Usa vaga de estrangeiro · Slot 2/2</span>
+      <div class="profile-costs" style="margin-top:16px">
+        <div class="cost-item">
+          <div class="cost-label">Custo de compra</div>
+          <div class="cost-val">~€3,5M</div>
+        </div>
+        <div class="cost-item">
+          <div class="cost-label">Salário mensal</div>
+          <div class="cost-val">~R$ 250k/mês</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page page-break" style="padding-top:0">
+
+  <!-- RODRIGÃO -->
+  <div class="player-profile">
+    <div class="profile-header">
+      <div class="profile-header-left">
+        <div class="profile-number">03</div>
+        <div>
+          <div class="profile-name">Rodrigão</div>
+          <div class="profile-role">Zagueiro · Reserva da Zaga · Red Star Belgrade → CAP</div>
+        </div>
+      </div>
+      <div class="profile-flag">🇧🇷</div>
+    </div>
+    <div class="profile-body">
+      <div class="profile-stats">
+        <div class="stat-item">
+          <div class="stat-val">29</div>
+          <div class="stat-label">Idade</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">1,91m</div>
+          <div class="stat-label">Altura</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">Dir.</div>
+          <div class="stat-label">Pé</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">€2,5M</div>
+          <div class="stat-label">Val. TM</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">BRA</div>
+          <div class="stat-label">Sem vaga</div>
+        </div>
+      </div>
+      <p class="profile-desc">
+        Zagueiro completo formado no futebol europeu. Forte no jogo aéreo, bom na saída de bola, experiente em competições de alto nível — Red Star disputa Champions League e Europa League regularmente. Cobre as três posições da zaga sem queda perceptível de rendimento. Foi oferecido ao CAP, o que sinaliza disponibilidade do clube para negociar. Resolve de vez o problema do Léo como "zagueiro fraco do banco" sem consumir nenhuma vaga de estrangeiro.
+      </p>
+      <div class="profile-costs">
+        <div class="cost-item">
+          <div class="cost-label">Custo de compra</div>
+          <div class="cost-val">~€2,0M</div>
+        </div>
+        <div class="cost-item">
+          <div class="cost-label">Salário mensal</div>
+          <div class="cost-val">~R$ 150k/mês</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WALACE -->
+  <div class="player-profile">
+    <div class="profile-header">
+      <div class="profile-header-left">
+        <div class="profile-number">04</div>
+        <div>
+          <div class="profile-name">Walace</div>
+          <div class="profile-role">Volante (1º/2º) · Cruzeiro → CAP</div>
+        </div>
+      </div>
+      <div class="profile-flag">🇧🇷</div>
+    </div>
+    <div class="profile-body">
+      <div class="profile-stats">
+        <div class="stat-item">
+          <div class="stat-val">31</div>
+          <div class="stat-label">Idade</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">1,82m</div>
+          <div class="stat-label">Altura</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">Dir.</div>
+          <div class="stat-label">Pé</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">€1,5M</div>
+          <div class="stat-label">Val. TM</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">5 anos</div>
+          <div class="stat-label">Serie A ITA</div>
+        </div>
+      </div>
+      <p class="profile-desc">
+        Volante completo com passagem de 5 anos na Serie A italiana (Udinese). Equilibra destruição e construção — não é só marcador, tem qualidade de passe e cobertura posicional. Em esquemas de bloqueio médio-baixo como o do CAP, é o perfil ideal: sabe defender compacto, pressionar no momento certo e sair limpo com a bola. Cobre o Portilla (1º volante) e o Luiz Gustavo (2º volante) sem queda de nível. Saindo do Cruzeiro por conflito interno — motivado, disponível e com custo muito abaixo do seu nível real.
+      </p>
+      <div class="profile-costs">
+        <div class="cost-item">
+          <div class="cost-label">Custo de compra</div>
+          <div class="cost-val">~€1,0M</div>
+        </div>
+        <div class="cost-item">
+          <div class="cost-label">Salário mensal</div>
+          <div class="cost-val">~R$ 400k/mês</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PEDRO RAUL -->
+  <div class="player-profile" style="margin-top:0">
+    <div class="profile-header">
+      <div class="profile-header-left">
+        <div class="profile-number">05</div>
+        <div>
+          <div class="profile-name">Pedro Raul</div>
+          <div class="profile-role">Centroavante · Reserva do Viveros · Empréstimo</div>
+        </div>
+      </div>
+      <div class="profile-flag">🇧🇷</div>
+    </div>
+    <div class="profile-body">
+      <div class="profile-stats">
+        <div class="stat-item">
+          <div class="stat-val">27</div>
+          <div class="stat-label">Idade</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">1,88m</div>
+          <div class="stat-label">Altura</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">Dir.</div>
+          <div class="stat-label">Pé</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">~€2M</div>
+          <div class="stat-label">Val. TM</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">LOAN</div>
+          <div class="stat-label">Tipo</div>
+        </div>
+      </div>
+      <p class="profile-desc">
+        Centroavante de área com perfil de hold-up play — completamente diferente do Viveros, o que é justamente o valor dele. Segura a bola de costas, ganha duelos físicos, é referência para cruzamentos e bolas aéreas. Num jogo difícil fora de casa em que o CAP precisa segurar o resultado, Pedro Raul fecha o jogo de outro jeito. Conhece o clube e o trabalho do Odair. Salário dividido com o clube dono: custo real ao CAP é baixo.
+      </p>
+      <div class="profile-costs">
+        <div class="cost-item">
+          <div class="cost-label">Taxa de empréstimo</div>
+          <div class="cost-val">~€500k</div>
+        </div>
+        <div class="cost-item">
+          <div class="cost-label">Salário mensal</div>
+          <div class="cost-val">~R$ 450k/mês</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: FINANCIALS -->
+<div class="page page-break">
+  <div class="section-header">
+    <span class="section-number">04</span>
+    <span class="section-title">Balanço Financeiro da Janela</span>
+  </div>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:24px;">
+
+    <!-- SAÍDAS -->
+    <div class="finance-block">
+      <div class="finance-header">Vendas · Receitas</div>
+      <div class="finance-row">
+        <div>
+          <div class="finance-label">Bruno Zapelli</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;">Venda · Saída prevista</div>
+        </div>
+        <div class="finance-val positive">+ €10,0M</div>
+      </div>
+      <div class="finance-row">
+        <div>
+          <div class="finance-label">Bruninho Braga Ramos</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;">Venda · Shakhtar Donetsk</div>
+        </div>
+        <div class="finance-val positive">+ €14,0M</div>
+      </div>
+      <div class="finance-row">
+        <div>
+          <div class="finance-label">Léo Pelé (Léo Pinheiro)</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;">Venda · Saída prevista</div>
+        </div>
+        <div class="finance-val positive">+ €1,3M</div>
+      </div>
+      <div class="finance-row">
+        <div>
+          <div class="finance-label">Luís Eduardo (Dudu)</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;">Venda · Lateral Direito</div>
+        </div>
+        <div class="finance-val positive">+ €0,25M</div>
+      </div>
+      <div class="finance-row">
+        <div>
+          <div class="finance-label">Ryan Roberto</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;">Venda · Ex-base CAP · Flamengo → Shakhtar</div>
+        </div>
+        <div class="finance-val positive">+ €2,5M</div>
+      </div>
+      <div class="finance-row total">
+        <div class="finance-label">Total de Receitas</div>
+        <div class="finance-val positive">+ €28,05M</div>
+      </div>
+    </div>
+
+    <!-- ENTRADAS -->
+    <div class="finance-block">
+      <div class="finance-header">Contratações · Investimentos</div>
+      <div class="finance-row">
+        <div>
+          <div class="finance-label">Alan Lescano</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;">Compra · Argentinos + Gimnasia</div>
+        </div>
+        <div class="finance-val negative">− €7,0M</div>
+      </div>
+      <div class="finance-row">
+        <div>
+          <div class="finance-label">Kerwin Vargas</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;">Compra · Charlotte FC</div>
+        </div>
+        <div class="finance-val negative">− €3,5M</div>
+      </div>
+      <div class="finance-row">
+        <div>
+          <div class="finance-label">Rodrigão</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;">Compra · Red Star Belgrade</div>
+        </div>
+        <div class="finance-val negative">− €2,0M</div>
+      </div>
+      <div class="finance-row">
+        <div>
+          <div class="finance-label">Walace</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;">Compra · Cruzeiro</div>
+        </div>
+        <div class="finance-val negative">− €1,0M</div>
+      </div>
+      <div class="finance-row">
+        <div>
+          <div class="finance-label">Pedro Raul</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;">Empréstimo · Taxa</div>
+        </div>
+        <div class="finance-val negative">− €0,5M</div>
+      </div>
+      <div class="finance-row total">
+        <div class="finance-label">Total Investido</div>
+        <div class="finance-val negative">− €14,0M</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SALDO -->
+  <div class="balance-card">
+    <div class="balance-label">Saldo Líquido da Janela</div>
+    <div class="balance-val">+ €14,05M</div>
+    <div class="balance-desc">O CAP fecha a janela no lucro — elenco reforçado com caixa positivo</div>
+  </div>
+
+  <!-- SALÁRIOS -->
+  <div class="finance-block">
+    <div class="finance-header">Salários Mensais Estimados · Contratações</div>
+    <div class="finance-row">
+      <div class="finance-label">Alan Lescano</div>
+      <div class="finance-val">~R$ 400k / mês</div>
+    </div>
+    <div class="finance-row">
+      <div class="finance-label">Kerwin Vargas</div>
+      <div class="finance-val">~R$ 250k / mês</div>
+    </div>
+    <div class="finance-row">
+      <div class="finance-label">Walace</div>
+      <div class="finance-val">~R$ 400k / mês</div>
+    </div>
+    <div class="finance-row">
+      <div class="finance-label">Rodrigão</div>
+      <div class="finance-val">~R$ 150k / mês</div>
+    </div>
+    <div class="finance-row">
+      <div class="finance-label">Pedro Raul</div>
+      <div class="finance-val">~R$ 450k / mês</div>
+    </div>
+    <div class="finance-row total">
+      <div class="finance-label">Folha adicional total</div>
+      <div class="finance-val">~R$ 1,65M / mês</div>
+    </div>
+  </div>
+
+  <div style="margin-top:12px; background:var(--card); border:1px solid var(--border); border-radius:8px; padding:20px 24px;">
+    <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:16px;">Estrangeiros do Elenco · 9 Atletas · Ordem Alfabética</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+      <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:6px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-size:12px;font-weight:700;color:var(--text);">Felipe Aguirre</div>
+        <div style="font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;">Elenco</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:6px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-size:12px;font-weight:700;color:var(--text);">Gastón Benavídez</div>
+        <div style="font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;">Elenco</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:6px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-size:12px;font-weight:700;color:var(--text);">Lucas Esquivel</div>
+        <div style="font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;">Elenco</div>
+      </div>
+      <div style="background:rgba(204,0,0,0.08);border:1px solid rgba(204,0,0,0.25);border-radius:6px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-size:12px;font-weight:700;color:var(--text);">Kerwin Vargas</div>
+        <div style="font-size:9px;color:var(--red);letter-spacing:1px;text-transform:uppercase;">Contratação</div>
+      </div>
+      <div style="background:rgba(204,0,0,0.08);border:1px solid rgba(204,0,0,0.25);border-radius:6px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-size:12px;font-weight:700;color:var(--text);">Alan Lescano</div>
+        <div style="font-size:9px;color:var(--red);letter-spacing:1px;text-transform:uppercase;">Contratação</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:6px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-size:12px;font-weight:700;color:var(--text);">Stiven Mendoza</div>
+        <div style="font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;">Elenco</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:6px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-size:12px;font-weight:700;color:var(--text);">Juan Portilla</div>
+        <div style="font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;">Elenco</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:6px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-size:12px;font-weight:700;color:var(--text);">Carlos Terán</div>
+        <div style="font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;">Elenco</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:6px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-size:12px;font-weight:700;color:var(--text);">Kevin Viveros</div>
+        <div style="font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;">Elenco</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="doc-footer">
+  Athletico Paranaense · Relatório de Janela 2026 · Documento Interno · Odair Hellmann
+</div>
+
+</body>
+</html>
