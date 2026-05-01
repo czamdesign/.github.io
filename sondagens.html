@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAP 2026 · Sondagens & Alternativas</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
+
+  html { scroll-behavior: smooth; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --red: #CC0000;
+    --dark-red: #990000;
+    --black: #0A0A0A;
+    --dark: #111111;
+    --mid: #1A1A1A;
+    --card: #1E1E1E;
+    --border: #2A2A2A;
+    --text: #E8E8E8;
+    --muted: #888888;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--black);
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 85px 48px 60px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title {
+    font-size: 22px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .doc-footer {
+    text-align: center;
+    padding: 40px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* NAV */
+  .doc-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 200;
+    background: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    padding-top: 28px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+
+  .doc-nav.nav-hidden {
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .nav-item {
+    color: #555;
+    text-decoration: none;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    padding: 10px 28px;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+    white-space: nowrap;
+  }
+
+  .nav-item:hover, .nav-item.active {
+    color: #E8E8E8;
+    border-bottom-color: var(--red);
+  }
+
+  /* FILTER BAR */
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    background: transparent;
+    border: 1px solid #2a2a2a;
+    color: #555;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 9px 22px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+  }
+  .filter-btn:hover { color: #e8e8e8; border-color: #444; }
+  .filter-btn.active { background: var(--red); border-color: var(--red); color: #fff; }
+
+  /* HIDE EMOJIS ON DESKTOP */
+  @media (min-width: 769px) {
+    .emoji { display: none; }
+  }
+
+  /* HAMBURGER */
+  .hamburger {
+    display: none;
+    position: fixed;
+    top: 18px;
+    right: 20px;
+    z-index: 300;
+    background: none;
+    border: none;
+    cursor: pointer;
+    flex-direction: column;
+    gap: 5px;
+    padding: 8px;
+  }
+  .hamburger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #555;
+    transition: all 0.25s;
+  }
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); background: #e8e8e8; }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); background: #e8e8e8; }
+
+  /* MOBILE NAV OVERLAY */
+  .mobile-nav-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 250;
+    background: #0a0a0a;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .mobile-nav-overlay.open { display: flex; }
+  .mobile-nav-link {
+    color: #444;
+    text-decoration: none;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 22px 0;
+    border-bottom: 1px solid #141414;
+    width: 100%;
+    text-align: center;
+    transition: color 0.2s;
+  }
+  .mobile-nav-link:first-of-type { border-top: 1px solid #141414; }
+  .mobile-nav-link:hover, .mobile-nav-link.active { color: #e8e8e8; }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    .page { padding: 32px 18px; }
+    .alts-grid { grid-template-columns: 1fr !important; }
+    .doc-nav { display: none; }
+    .hamburger { display: flex; }
+
+    /* "Ver Detalhes" no mobile: sai da linha dos filtros, vira link sutil */
+    .filter-expand-btn {
+      margin-left: auto !important;
+      order: 99;
+      text-align: right;
+      background: transparent !important;
+      border-color: transparent !important;
+      color: #444 !important;
+      padding: 4px 0 !important;
+      font-size: 8px !important;
+      letter-spacing: 1.5px !important;
+      border-radius: 0 !important;
+    }
+    .filter-expand-btn.active {
+      background: transparent !important;
+      border-color: transparent !important;
+      color: #777 !important;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .filter-expand-btn:hover {
+      color: #aaa !important;
+      border-color: transparent !important;
+    }
+
+    /* Alternativas: 2-col card grids → 1 col */
+    [data-group] div[style*="repeat(2,1fr)"] {
+      grid-template-columns: 1fr !important;
+    }
+    /* Alternativas: 4-col stat grids → 2 col */
+    [data-group] div[style*="repeat(4,1fr)"] {
+      grid-template-columns: repeat(2,1fr) !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- HAMBURGER (mobile) -->
+<button class="hamburger" id="hamburger" aria-label="Menu">
+  <span></span><span></span><span></span>
+</button>
+
+<!-- MOBILE NAV OVERLAY -->
+<div class="mobile-nav-overlay" id="mobileNav">
+  <a href="index.html" class="mobile-nav-link">Home</a>
+  <a href="sondagens.html" class="mobile-nav-link active">Sondagens &amp; Alternativas</a>
+</div>
+
+<!-- NAV -->
+<nav class="doc-nav">
+  <a href="index.html" class="nav-item">Home</a>
+  <a href="index.html#iniciais" class="nav-item">11 Iniciais</a>
+  <a href="index.html#reservas" class="nav-item">Reservas</a>
+  <a href="index.html#contratacoes" class="nav-item">Contratações</a>
+  <a href="index.html#financeiro" class="nav-item">Balanço Financeiro</a>
+  <a href="sondagens.html" class="nav-item active">Sondagens &amp; Alternativas</a>
+</nav>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div style="margin-bottom:40px;padding-bottom:20px;border-bottom:1px solid var(--border);">
+    <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:6px;">Athletico Paranaense · 2026</div>
+    <div style="font-size:26px;font-weight:900;text-transform:uppercase;letter-spacing:0.5px;">Sondagens <span style="color:var(--red);">&</span> Alternativas</div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <button class="filter-btn active" data-filter="all">Todos</button>
+    <button class="filter-btn" data-filter="defensores">Defensores</button>
+    <button class="filter-btn" data-filter="meios">Meio-campistas</button>
+    <button class="filter-btn" data-filter="atacantes">Atacantes</button>
+    <button class="filter-btn filter-expand-btn" data-filter="expanded" style="margin-left:auto;">Ver Detalhes</button>
+  </div>
+
+  <!-- SONDAGENS BLOCK -->
+  <div style="margin-bottom:8px;">
+    <div style="font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:16px;">Sondagens da Janela · 33 Atletas Monitorados</div>
+  </div>
+
+  <div id="sondagens-grid" style="background:#0c0c0c;border:1px solid #1e1e1e;border-left:3px solid rgba(190,0,0,0.65);border-radius:8px;overflow:hidden;box-shadow:0 6px 28px rgba(0,0,0,0.55);margin-bottom:48px;">
+
+    <!-- ZAG -->
+    <div data-group="defensores" style="padding:20px 20px 18px;border-bottom:1px solid #222;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:12px;">Zagueiro · 8</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Adryelson</div><div style="font-size:10px;color:#555;margin-top:1px;">Al-Wasl · <span class="emoji">🇧🇷</span></div></div>
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Arboleda</div><div style="font-size:10px;color:#555;margin-top:1px;">São Paulo · <span class="emoji">🇪🇨</span></div></div>
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Cacá</div><div style="font-size:10px;color:#555;margin-top:1px;">Vitória · <span class="emoji">🇧🇷</span></div></div>
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Dantas</div><div style="font-size:10px;color:#555;margin-top:1px;">Novorizontino · <span class="emoji">🇧🇷</span></div></div>
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Diego Costa</div><div style="font-size:10px;color:#555;margin-top:1px;">Krasnodar · <span class="emoji">🇧🇷</span></div></div>
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Igor Rabello</div><div style="font-size:10px;color:#555;margin-top:1px;">Atlético-MG · <span class="emoji">🇧🇷</span></div></div>
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">João Basso</div><div style="font-size:10px;color:#555;margin-top:1px;">Cuiabá · <span class="emoji">🇧🇷</span></div></div>
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">João Marcelo</div><div style="font-size:10px;color:#555;margin-top:1px;">Cruzeiro · <span class="emoji">🇧🇷</span></div></div>
+      </div>
+    </div>
+
+    <!-- LATERAL -->
+    <div data-group="defensores" style="padding:20px 20px 18px;border-bottom:1px solid #222;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:12px;">Lateral · 1</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Gabriel Fuentes</div><div style="font-size:10px;color:#555;margin-top:1px;">Fluminense · <span class="emoji">🇨🇴</span></div></div>
+      </div>
+    </div>
+
+    <!-- VOLANTE -->
+    <div data-group="meios" style="padding:20px 20px 18px;border-bottom:1px solid #222;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:12px;">Volante · 5</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Andrés Cubas</div><div style="font-size:10px;color:#555;margin-top:1px;">Vancouver Whitecaps · <span class="emoji">🇵🇾</span></div></div>
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Bruno Gomes</div><div style="font-size:10px;color:#555;margin-top:1px;">Internacional · <span class="emoji">🇧🇷</span></div></div>
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">João Schmidt</div><div style="font-size:10px;color:#555;margin-top:1px;">Santos · <span class="emoji">🇧🇷</span></div></div>
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Lucas Sasha</div><div style="font-size:10px;color:#555;margin-top:1px;">Fortaleza · <span class="emoji">🇧🇷</span></div></div>
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Otávio</div><div style="font-size:10px;color:#555;margin-top:1px;">Fluminense · <span class="emoji">🇧🇷</span></div></div>
+      </div>
+    </div>
+
+    <!-- MEIA CENTRAL -->
+    <div data-group="meios" style="padding:20px 20px 18px;border-bottom:1px solid #222;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:12px;">Meia Central · 4</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Hernani</div><div style="font-size:10px;color:#555;margin-top:1px;">Monza · <span class="emoji">🇧🇷</span></div></div>
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Matheus Pereira</div><div style="font-size:10px;color:#555;margin-top:1px;">Corinthians · <span class="emoji">🇧🇷</span></div></div>
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Matheus Rossetto</div><div style="font-size:10px;color:#555;margin-top:1px;">Fortaleza · <span class="emoji">🇧🇷</span></div></div>
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Paulinho Paula</div><div style="font-size:10px;color:#555;margin-top:1px;">Internacional · <span class="emoji">🇧🇷</span></div></div>
+      </div>
+    </div>
+
+    <!-- MEIA ARMADOR -->
+    <div data-group="meios" style="padding:20px 20px 18px;border-bottom:1px solid #222;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:12px;">Meia Armador · 4</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Leo Bittencourt</div><div style="font-size:10px;color:#555;margin-top:1px;">Werder Bremen · <span class="emoji">🇩🇪</span></div></div>
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Mandaca</div><div style="font-size:10px;color:#555;margin-top:1px;">Juventude · <span class="emoji">🇧🇷</span></div></div>
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Thaciano</div><div style="font-size:10px;color:#555;margin-top:1px;">Santos · <span class="emoji">🇧🇷</span></div></div>
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Vitor Bueno</div><div style="font-size:10px;color:#555;margin-top:1px;">Remo · <span class="emoji">🇧🇷</span></div></div>
+      </div>
+    </div>
+
+    <!-- PONTA ESQUERDA -->
+    <div data-group="atacantes" style="padding:20px 20px 18px;border-bottom:1px solid #222;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:12px;">Ponta Esquerda · 7</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Bruno Rodrigues</div><div style="font-size:10px;color:#555;margin-top:1px;">Cruzeiro · <span class="emoji">🇧🇷</span></div></div>
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Edwuin Cetré</div><div style="font-size:10px;color:#555;margin-top:1px;">Estudiantes LP · <span class="emoji">🇨🇴</span></div></div>
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Jeffinho</div><div style="font-size:10px;color:#555;margin-top:1px;">Botafogo · <span class="emoji">🇧🇷</span></div></div>
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Jhonata Robert</div><div style="font-size:10px;color:#555;margin-top:1px;">Criciúma · <span class="emoji">🇧🇷</span></div></div>
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Johan Rojas</div><div style="font-size:10px;color:#555;margin-top:1px;">Vasco · <span class="emoji">🇨🇴</span></div></div>
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Luís Angulo</div><div style="font-size:10px;color:#555;margin-top:1px;">Peñarol · <span class="emoji">🇨🇴</span></div></div>
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Victor Sá</div><div style="font-size:10px;color:#555;margin-top:1px;">Krasnodar · <span class="emoji">🇧🇷</span></div></div>
+      </div>
+    </div>
+
+    <!-- PONTA DIREITA -->
+    <div data-group="atacantes" style="padding:20px 20px 18px;border-bottom:1px solid #222;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:12px;">Ponta Direita · 2</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Ademir</div><div style="font-size:10px;color:#555;margin-top:1px;">Bahia · <span class="emoji">🇧🇷</span></div></div>
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Marinho</div><div style="font-size:10px;color:#555;margin-top:1px;">Vitória · <span class="emoji">🇧🇷</span></div></div>
+      </div>
+    </div>
+
+    <!-- CENTROAVANTE -->
+    <div data-group="atacantes" style="padding:20px 20px 18px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:12px;">Centroavante · 2</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Eduardo Sasha</div><div style="font-size:10px;color:#555;margin-top:1px;">RB Bragantino · <span class="emoji">🇧🇷</span></div></div>
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;"><div style="font-size:12px;font-weight:600;color:#ccc;">Léo Gaúcho</div><div style="font-size:10px;color:#555;margin-top:1px;">Operário · <span class="emoji">🇧🇷</span></div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ALTERNATIVAS RECOMENDADAS -->
+  <div style="margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border);">
+    <span style="font-size:22px;font-weight:700;text-transform:uppercase;color:#e8e8e8;letter-spacing:1px;">Alternativas Recomendadas</span>
+  </div>
+
+  <div class="filter-bar">
+    <button class="filter-btn active" data-filter-alts="all">Todos</button>
+    <button class="filter-btn" data-filter-alts="defensores">Defensores</button>
+    <button class="filter-btn" data-filter-alts="meios">Meio-campistas</button>
+    <button class="filter-btn" data-filter-alts="atacantes">Atacantes</button>
+    <button class="filter-btn filter-expand-btn" data-filter-alts="expanded" style="margin-left:auto;">Ver Detalhes</button>
+  </div>
+
+  <div id="alternativas-grid" style="background:#0c0c0c;border:1px solid #1e1e1e;border-left:3px solid rgba(190,0,0,0.65);border-radius:8px;overflow:hidden;box-shadow:0 6px 28px rgba(0,0,0,0.55);">
+
+    <!-- ZAGUEIRO -->
+    <div data-group="defensores" style="padding:24px;border-bottom:1px solid #222;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:16px;">Zagueiro &middot; 3</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
+
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:8px;padding:16px 18px;">
+          <div style="margin-bottom:10px;">
+            <div style="font-size:14px;font-weight:800;color:#e8e8e8;">Marco Di Cesare</div>
+            <div style="font-size:10px;color:#555;margin-top:3px;">ZAG &middot; Racing Club <span class="emoji">&#127462;&#127479;</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;">
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:var(--red);">24</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Idade</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#e8e8e8;">1.86m</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Altura</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#e8e8e8;">&#8364;6.0M</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Val. TM</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:11px;font-weight:700;color:#888;">DEZ 2027</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Contrato</div></div>
+          </div>
+          <p style="font-size:12px;color:#999;line-height:1.75;margin:0;">Zagueiro argentino de 24 anos, campe&#227;o pela Racing Club e um dos defensores mais cobia&#231;ados do mercado sul-americano em 2026. Santos e Botafogo travaram disputa por ele na janela recente. Forte no duelo a&#233;reo e com boa sa&#237;da de bola, encaixaria como zagueiro esquerdo no sistema de tr&#234;s do Odair.</p>
+        </div>
+
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:8px;padding:16px 18px;">
+          <div style="margin-bottom:10px;">
+            <div style="font-size:14px;font-weight:800;color:#e8e8e8;">Lautaro Di Lollo</div>
+            <div style="font-size:10px;color:#555;margin-top:3px;">ZAG &middot; Boca Juniors <span class="emoji">&#127462;&#127479;</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;">
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:var(--red);">22</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Idade</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#e8e8e8;">1.87m</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Altura</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#e8e8e8;">&#8364;6.0M</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Val. TM</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:11px;font-weight:700;color:#e8e8e8;">DEZ 2029</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Contrato</div></div>
+          </div>
+          <p style="font-size:12px;color:#999;line-height:1.75;margin:0;">Zagueiro moderno formado no Boca Juniors, clube que exige maturidade antecipada pela press&#227;o constante. Sai jogando com confian&#231;a, forte na marca&#231;&#227;o individual e com boa leitura de jogo em bloco baixo. Contrato at&#233; 2029 exige negocia&#231;&#227;o, mas o perfil e a idade justificam o investimento.</p>
+        </div>
+
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:8px;padding:16px 18px;">
+          <div style="margin-bottom:10px;">
+            <div style="font-size:14px;font-weight:800;color:#e8e8e8;">Marlon</div>
+            <div style="font-size:10px;color:#555;margin-top:3px;">ZAG &middot; Shakhtar Donetsk <span class="emoji">&#127463;&#127479;</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;">
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:var(--red);">30</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Idade</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#e8e8e8;">1.82m</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Altura</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#e8e8e8;">&#8364;2.5M</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Val. TM</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:11px;font-weight:700;color:#CC6600;">JUN 2026</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Contrato</div></div>
+          </div>
+          <p style="font-size:12px;color:#999;line-height:1.75;margin:0;">Zagueiro brasileiro revelado pelo Fluminense, campe&#227;o da Libertadores 2023. Passagens por Barcelona, Sassuolo (Serie A) e Shakhtar Donetsk com experi&#234;ncia regular na Champions League. N&#227;o ocupa vaga de estrangeiro. Contrato com o Shakhtar encerrado em junho de 2026, abrindo possibilidade de contrata&#231;&#227;o a custo baixo.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- LATERAL -->
+    <div data-group="defensores" style="padding:24px;border-bottom:1px solid #222;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:16px;">Lateral &middot; 1</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
+
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:8px;padding:16px 18px;">
+          <div style="margin-bottom:10px;">
+            <div style="font-size:14px;font-weight:800;color:#e8e8e8;">Gast&#243;n &#193;vila</div>
+            <div style="font-size:10px;color:#555;margin-top:3px;">LAT ESQ &middot; Rosario Central (emp. Ajax) <span class="emoji">&#127462;&#127479;</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;">
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:var(--red);">24</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Idade</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#e8e8e8;">1.82m</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Altura</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#e8e8e8;">&#8364;2.5M</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Val. TM</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:11px;font-weight:700;color:#CC6600;">DEZ 2026</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Empr.</div></div>
+          </div>
+          <p style="font-size:12px;color:#999;line-height:1.75;margin:0;">Lateral esquerdo de 24 anos com propriedade no Ajax, clube que o adquiriu por &#8364;12.5M. Monitorado pelo S&#227;o Paulo na janela de 2026, optou por retornar &#224; Argentina. No 3-5-2 atuaria como ala esquerdo, fun&#231;&#227;o que j&#225; exerceu com equil&#237;brio ofensivo e defensivo. Empr&#233;stimo encerrado em dezembro abre janela natural.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- VOLANTE -->
+    <div data-group="meios" style="padding:24px;border-bottom:1px solid #222;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:16px;">Volante &middot; 2</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
+
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:8px;padding:16px 18px;">
+          <div style="margin-bottom:10px;">
+            <div style="font-size:14px;font-weight:800;color:#e8e8e8;">Franco Ibarra</div>
+            <div style="font-size:10px;color:#555;margin-top:3px;">VOL &middot; Rosario Central <span class="emoji">&#127462;&#127479;</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;">
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:var(--red);">25</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Idade</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#e8e8e8;">1.75m</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Altura</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#e8e8e8;">&#8364;4.5M</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Val. TM</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:11px;font-weight:700;color:#888;">DEZ 2027</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Contrato</div></div>
+          </div>
+          <p style="font-size:12px;color:#999;line-height:1.75;margin:0;">Box-to-box de alta intensidade com equil&#237;brio t&#233;cnico-f&#237;sico raro no mercado sul-americano. Encaixaria diretamente no duplo piv&#244; ao lado do Portilla, liberando o Luiz Gustavo para avan&#231;ar com mais frequ&#234;ncia. Perfil que o CAP buscou nesta janela sem encontrar.</p>
+        </div>
+
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:8px;padding:16px 18px;">
+          <div style="margin-bottom:10px;">
+            <div style="font-size:14px;font-weight:800;color:#e8e8e8;">Thiago Maia</div>
+            <div style="font-size:10px;color:#555;margin-top:3px;">VOL &middot; Internacional <span class="emoji">&#127463;&#127479;</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;">
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:var(--red);">29</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Idade</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#e8e8e8;">1.79m</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Altura</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#e8e8e8;">&#8364;3.0M</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Val. TM</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:11px;font-weight:700;color:#CC6600;">DEZ 2026</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Contrato</div></div>
+          </div>
+          <p style="font-size:12px;color:#999;line-height:1.75;margin:0;">Volante defensivo com curr&#237;culo s&#243;lido: Flamengo (bicampe&#227;o da Libertadores), Lille na Ligue 1 e Sele&#231;&#227;o Brasileira. Pediu para sair do Internacional em 2026, com contrato expirando em dezembro. Perfil mais destruidor que o Ibarra, refor&#231;aria o duplo piv&#244; com presen&#231;a defensiva. N&#227;o ocupa vaga de estrangeiro.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ARMADOR -->
+    <div data-group="meios" style="padding:24px;border-bottom:1px solid #222;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:16px;">Armador &middot; 2</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
+
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:8px;padding:16px 18px;">
+          <div style="margin-bottom:10px;">
+            <div style="font-size:14px;font-weight:800;color:#e8e8e8;">Marcelino Moreno</div>
+            <div style="font-size:10px;color:#555;margin-top:3px;">MEI ATK &middot; Lan&#250;s <span class="emoji">&#127462;&#127479;</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;">
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:var(--red);">30</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Idade</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#e8e8e8;">1.68m</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Altura</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#e8e8e8;">&#8364;5.0M</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Val. TM</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:11px;font-weight:700;color:#CC6600;">DEZ 2026</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Contrato</div></div>
+          </div>
+          <p style="font-size:12px;color:#999;line-height:1.75;margin:0;">Meia atacante argentino de 30 anos com 9 gols e 5 assist&#234;ncias em 33 jogos pelo Lan&#250;s em 2025. Armador criativo, com passe entre linhas e capacidade de decidir. J&#225; foi linkado diretamente ao Athletico em janelas anteriores. Contrato expirando em dezembro de 2026, o que facilita a negocia&#231;&#227;o como segunda op&#231;&#227;o ao Lescano.</p>
+        </div>
+
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:8px;padding:16px 18px;">
+          <div style="margin-bottom:10px;">
+            <div style="font-size:14px;font-weight:800;color:#e8e8e8;">Alan</div>
+            <div style="font-size:10px;color:#555;margin-top:3px;">MEI &middot; Moreirense <span class="emoji">&#127463;&#127479;</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;">
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:var(--red);">26</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Idade</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#e8e8e8;">1.65m</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Altura</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#e8e8e8;">&#8364;4.0M</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Val. TM</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:11px;font-weight:700;color:#CC6600;">JUN 2026</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Contrato</div></div>
+          </div>
+          <p style="font-size:12px;color:#999;line-height:1.75;margin:0;">Meia brasileiro de 26 anos, ex-base do Palmeiras, se valorizando no futebol portugu&#234;s pelo Moreirense. Contrato expirando em junho de 2026. Gr&#234;mio, Internacional e Cruzeiro j&#225; entraram na disputa pelo jogador, o que valida o n&#237;vel. Janela de oportunidade imediata para o CAP agir antes da concorr&#234;ncia.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- PONTA ESQUERDA -->
+    <div data-group="atacantes" style="padding:24px;border-bottom:1px solid #222;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:16px;">Ponta Esquerda &middot; 3</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
+
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:8px;padding:16px 18px;">
+          <div style="margin-bottom:10px;">
+            <div style="font-size:14px;font-weight:800;color:#e8e8e8;">Alan Velasco</div>
+            <div style="font-size:10px;color:#555;margin-top:3px;">PE &middot; Boca Juniors <span class="emoji">&#127462;&#127479;</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;">
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:var(--red);">23</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Idade</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#e8e8e8;">1.67m</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Altura</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#e8e8e8;">&#8364;2.8M</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Val. TM</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:11px;font-weight:700;color:#e8e8e8;">DEZ 2028</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Contrato</div></div>
+          </div>
+          <p style="font-size:12px;color:#999;line-height:1.75;margin:0;">Extremo esquerdo argentino de 23 anos com passagem pelo futebol europeu e pela MLS. No Boca, ganhou consist&#234;ncia e maturidade t&#225;tica. Joga de cara ao gol, desequilibra em espa&#231;os reduzidos e tem boa capacidade de finaliza&#231;&#227;o. Perfil de segundo atacante que o 3-5-2 do Odair comporta bem.</p>
+        </div>
+
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:8px;padding:16px 18px;">
+          <div style="margin-bottom:10px;">
+            <div style="font-size:14px;font-weight:800;color:#e8e8e8;">Brian Rodr&#237;guez</div>
+            <div style="font-size:10px;color:#555;margin-top:3px;">PE &middot; Club Am&#233;rica <span class="emoji">&#127482;&#127486;</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;">
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:var(--red);">25</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Idade</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#e8e8e8;">1.72m</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Altura</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#e8e8e8;">&#8364;6.5M</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Val. TM</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:11px;font-weight:700;color:#e8e8e8;">JUN 2029</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Contrato</div></div>
+          </div>
+          <p style="font-size:12px;color:#999;line-height:1.75;margin:0;">Extremo uruguaio de 25 anos em excelente fase no Club Am&#233;rica do M&#233;xico, com 10 gols e 9 assist&#234;ncias na temporada. Explosivo, veloz e direto, satura o advers&#225;rio pelo corredor esquerdo em transi&#231;&#245;es r&#225;pidas. Adapt&#225;vel a novos contextos, j&#225; demonstrado em MLS e LigaMX.</p>
+        </div>
+
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:8px;padding:16px 18px;">
+          <div style="margin-bottom:10px;">
+            <div style="font-size:14px;font-weight:800;color:#e8e8e8;">Iv&#225;n Angulo</div>
+            <div style="font-size:10px;color:#555;margin-top:3px;">PE &middot; Orlando City <span class="emoji">&#127464;&#127476;</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;">
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:var(--red);">27</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Idade</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#e8e8e8;">1.79m</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Altura</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#e8e8e8;">&#8364;3.0M</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Val. TM</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:11px;font-weight:700;color:#CC6600;">DEZ 2026</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Contrato</div></div>
+          </div>
+          <p style="font-size:12px;color:#999;line-height:1.75;margin:0;">Ponta colombiano com passagens por Palmeiras, Botafogo e Cruzeiro. Conhece o futebol brasileiro, joga de cara ao gol e tem bom volume de dribles no 1v1. Contrato com o Orlando City encerrado em dezembro de 2026 abre oportunidade de contrata&#231;&#227;o a custo reduzido.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- PONTA DIREITA -->
+    <div data-group="atacantes" style="padding:24px;border-bottom:1px solid #222;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:16px;">Ponta Direita &middot; 2</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
+
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:8px;padding:16px 18px;">
+          <div style="margin-bottom:10px;">
+            <div style="font-size:14px;font-weight:800;color:#e8e8e8;">Marquinhos</div>
+            <div style="font-size:10px;color:#555;margin-top:3px;">PD &middot; Cruzeiro <span class="emoji">&#127463;&#127479;</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;">
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:var(--red);">23</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Idade</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#e8e8e8;">1.75m</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Altura</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#e8e8e8;">&#8364;3.0M</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Val. TM</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:11px;font-weight:700;color:#e8e8e8;">DEZ 2028</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Contrato</div></div>
+          </div>
+          <p style="font-size:12px;color:#999;line-height:1.75;margin:0;">Ponta direita brasileiro de 23 anos adquirido pelo Cruzeiro por R&#36; 19 milh&#245;es. Retornou de les&#227;o em abril de 2026 e disputa espa&#231;o no elenco de Artur Jorge. Criativo e desequilibrante pelo corredor direito. Caso perca espa&#231;o na Raposa, o CAP teria condi&#231;&#245;es de absorv&#234;-lo com custo vi&#225;vel.</p>
+        </div>
+
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:8px;padding:16px 18px;">
+          <div style="margin-bottom:10px;">
+            <div style="font-size:14px;font-weight:800;color:#e8e8e8;">Kevin Serna</div>
+            <div style="font-size:10px;color:#555;margin-top:3px;">PD &middot; Fluminense <span class="emoji">&#127464;&#127476;</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;">
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:var(--red);">28</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Idade</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#e8e8e8;">1.82m</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Altura</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#e8e8e8;">&#8364;5.0M</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Val. TM</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:11px;font-weight:700;color:#e8e8e8;">DEZ 2028</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Contrato</div></div>
+          </div>
+          <p style="font-size:12px;color:#999;line-height:1.75;margin:0;">Ponta direita colombiano de 28 anos e artilheiro do Fluminense em 2026 com 5 gols em 9 jogos. J&#225; adaptado ao futebol brasileiro, o que elimina o per&#237;odo de ajuste. Veloz, direto e com bom volume de finaliza&#231;&#245;es. Alternativa de impacto imediato ao Benavidez pelo corredor direito.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CENTROAVANTE -->
+    <div data-group="atacantes" style="padding:24px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:16px;">Centroavante &middot; 1</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
+
+        <div style="background:#080808;border:1px solid #1e1e1e;border-radius:8px;padding:16px 18px;">
+          <div style="margin-bottom:10px;">
+            <div style="font-size:14px;font-weight:800;color:#e8e8e8;">Saulo Mineiro</div>
+            <div style="font-size:10px;color:#555;margin-top:3px;">CA &middot; Shanghai Shenhua <span class="emoji">&#127463;&#127479;</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;">
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:var(--red);">28</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Idade</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#e8e8e8;">1.84m</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Altura</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#e8e8e8;">&#8364;1.8M</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Val. TM</div></div>
+            <div style="background:#0e0e0e;border:1px solid #1a1a1a;border-radius:5px;padding:6px;text-align:center;"><div style="font-size:11px;font-weight:700;color:#CC6600;">DEZ 2026</div><div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Contrato</div></div>
+          </div>
+          <p style="font-size:12px;color:#999;line-height:1.75;margin:0;">Centroavante brasileiro em boa fase pelo Shanghai Shenhua, com gol e duas assist&#234;ncias j&#225; na estreia. Refer&#234;ncia f&#237;sica, bom no jogo a&#233;reo e com volume de gols consistente. Contrato encerrado em dezembro de 2026 abre janela de retorno ao Brasil com perfil diferente do Viveros.</p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="doc-footer">
+  Athletico Paranaense · Relatório de Janela 2026 · Documento Interno · Odair Hellmann
+</div>
+
+<script>
+  const nav = document.querySelector('.doc-nav');
+
+  // Gera visao compacta (lista flat nome+clube) e insere no topo da grid
+  function buildCompactView(gridId) {
+    var grid = document.getElementById(gridId);
+    var isAlts = gridId === 'alternativas-grid';
+    var items = [];
+
+    grid.querySelectorAll('[data-group]').forEach(function(group) {
+      var cardsContainer = group.children[1];
+      if (!cardsContainer) return;
+      Array.from(cardsContainer.children).forEach(function(card) {
+        var name = '', sub = '';
+        if (isAlts) {
+          var wrapper = card.children[0];
+          if (wrapper && wrapper.children[0]) {
+            name = wrapper.children[0].textContent.trim();
+            sub = wrapper.children[1] ? wrapper.children[1].textContent.trim() : '';
+          }
+        } else {
+          name = card.children[0] ? card.children[0].textContent.trim() : '';
+          sub  = card.children[1] ? card.children[1].textContent.trim() : '';
+        }
+        // Remove emoji (surrogate pairs) e espaco sobrando
+        sub = sub.replace(/[\uD83C-\uDBFF][\uDC00-\uDFFF]/g, '').replace(/\s+\xB7\s*$/, '').trim();
+        if (name) items.push({ name: name, sub: sub });
+      });
+    });
+
+    var overview = document.createElement('div');
+    overview.className = 'compact-overview';
+
+    var listWrap = document.createElement('div');
+    listWrap.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);';
+
+    items.forEach(function(item, i) {
+      var el = document.createElement('div');
+      var lastInRow = (i + 1) % 3 === 0;
+      el.style.cssText = 'padding:15px 22px;border-bottom:1px solid #141414;' +
+        (!lastInRow ? 'border-right:1px solid #141414;' : '');
+      el.innerHTML =
+        '<div style="font-size:13px;font-weight:600;color:#d0d0d0;margin-bottom:4px;">' + item.name + '</div>' +
+        '<div style="font-size:9px;color:#444;text-transform:uppercase;letter-spacing:1px;">' + item.sub + '</div>';
+      listWrap.appendChild(el);
+    });
+
+    overview.appendChild(listWrap);
+
+    var footer = document.createElement('div');
+    footer.style.cssText = 'padding:18px;text-align:center;cursor:pointer;font-size:9px;font-weight:700;letter-spacing:2.5px;color:#555;text-transform:uppercase;border-top:1px solid #141414;transition:color 0.2s;';
+    footer.textContent = 'VER DETALHES ↓';
+    footer.onmouseover = function() { footer.style.color = '#e8e8e8'; };
+    footer.onmouseout  = function() { footer.style.color = '#555'; };
+    footer.onclick = function() {
+      var sel = gridId === 'sondagens-grid' ? '[data-filter="expanded"]' : '[data-filter-alts="expanded"]';
+      var btn = document.querySelector(sel);
+      if (btn) btn.click();
+    };
+    overview.appendChild(footer);
+
+    grid.insertBefore(overview, grid.firstChild);
+  }
+
+  function applyFilter(gridId, f) {
+    var grid = document.getElementById(gridId);
+    var compact = grid.querySelector('.compact-overview');
+    if (f === 'all') {
+      if (compact) compact.style.display = '';
+      grid.querySelectorAll('[data-group]').forEach(function(el) { el.style.display = 'none'; });
+    } else if (f === 'expanded') {
+      if (compact) compact.style.display = 'none';
+      grid.querySelectorAll('[data-group]').forEach(function(el) {
+        el.style.display = '';
+        if (el.children[1]) el.children[1].style.display = '';
+      });
+    } else {
+      if (compact) compact.style.display = 'none';
+      grid.querySelectorAll('[data-group]').forEach(function(el) {
+        var match = el.dataset.group === f;
+        el.style.display = match ? '' : 'none';
+        if (match && el.children[1]) el.children[1].style.display = '';
+      });
+    }
+  }
+
+  // Filtro Sondagens
+  var sondBtns = document.querySelectorAll('[data-filter]');
+  var sondExpandBtn = document.querySelector('[data-filter="expanded"]');
+  sondBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var wasActive = btn.classList.contains('active');
+      var filterVal = btn.dataset.filter;
+      // Clicar num filtro ativo (exceto "all") colapsa de volta ao compacto
+      if (wasActive && filterVal !== 'all') {
+        sondBtns.forEach(function(b) { b.classList.remove('active'); });
+        document.querySelector('[data-filter="all"]').classList.add('active');
+        if (sondExpandBtn) sondExpandBtn.textContent = 'Ver Detalhes';
+        applyFilter('sondagens-grid', 'all');
+        return;
+      }
+      sondBtns.forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      if (sondExpandBtn) sondExpandBtn.textContent = (filterVal === 'expanded') ? 'Ver Menos' : 'Ver Detalhes';
+      applyFilter('sondagens-grid', filterVal);
+    });
+  });
+
+  // Filtro Alternativas
+  var altsBtns = document.querySelectorAll('[data-filter-alts]');
+  var altsExpandBtn = document.querySelector('[data-filter-alts="expanded"]');
+  altsBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var wasActive = btn.classList.contains('active');
+      var filterVal = btn.dataset.filterAlts;
+      // Clicar num filtro ativo (exceto "all") colapsa de volta ao compacto
+      if (wasActive && filterVal !== 'all') {
+        altsBtns.forEach(function(b) { b.classList.remove('active'); });
+        document.querySelector('[data-filter-alts="all"]').classList.add('active');
+        if (altsExpandBtn) altsExpandBtn.textContent = 'Ver Detalhes';
+        applyFilter('alternativas-grid', 'all');
+        return;
+      }
+      altsBtns.forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      if (altsExpandBtn) altsExpandBtn.textContent = (filterVal === 'expanded') ? 'Ver Menos' : 'Ver Detalhes';
+      applyFilter('alternativas-grid', filterVal);
+    });
+  });
+
+  buildCompactView('sondagens-grid');
+  buildCompactView('alternativas-grid');
+  applyFilter('sondagens-grid', 'all');
+  applyFilter('alternativas-grid', 'all');
+
+  // Hamburger mobile nav
+  var hamburger = document.getElementById('hamburger');
+  var mobileNav = document.getElementById('mobileNav');
+  hamburger.addEventListener('click', function() {
+    hamburger.classList.toggle('open');
+    mobileNav.classList.toggle('open');
+    document.body.style.overflow = mobileNav.classList.contains('open') ? 'hidden' : '';
+  });
+  // Fechar ao clicar num link
+  mobileNav.querySelectorAll('.mobile-nav-link').forEach(function(link) {
+    link.addEventListener('click', function() {
+      hamburger.classList.remove('open');
+      mobileNav.classList.remove('open');
+      document.body.style.overflow = '';
+    });
+  });
+
+  let lastScroll = 0;
+  window.addEventListener('scroll', () => {
+    const current = window.scrollY;
+    if (current > lastScroll && current > 80) {
+      nav.classList.add('nav-hidden');
+    } else {
+      nav.classList.remove('nav-hidden');
+    }
+    lastScroll = current;
+  });
+</script>
+</body>
+</html>
